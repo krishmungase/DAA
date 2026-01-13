@@ -40,16 +40,25 @@ int recursiveBinarySearch(const vector<int>& arr, int target,
 }
 
 int main() {
-    long long n = 100000;
+    long long n;
+    cout << "Enter the array size: ";
+    cin >> endl;
     vector<int> arr(n);
 
     srand(time(0));
 
     for (long long i = 0; i < n; i++) {
-        arr[i] = rand() % 100000;
+        arr[i] = rand();
+        cout << arr[i] << " ";
     }
 
-    int target = arr[n / 2];
+    cout << endl;
+
+    int target;
+    cout << "Enter the target: ";
+    cin >> target;
+
+    cout << endl;
 
     auto start1 = chrono::high_resolution_clock::now();
     int idx1 = linearSearch(arr, target, n);
