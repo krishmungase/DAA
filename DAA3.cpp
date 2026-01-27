@@ -1,0 +1,64 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+
+void primSimple(int V, vector<vector<pair<int,int>>> &adj) {
+    vector<int> key(V, INT_MAX);
+    vector<int> parent(V, -1);
+    vector<bool> visited(V, false);
+
+    key[0] = 0;
+
+    for (int count = 0; count < V - 1; count++) {
+        int u = -1;
+        int minKey = INT_MAX;
+
+        for (int i = 0; i < V; i++) {
+            if (!visited[i] && key[i] < minKey) {
+                minKey = key[i];
+                u = i;
+            }
+        }
+
+        visited[u] = true;
+
+        for (auto it : adj[u]) {
+            int v = it.first;
+            int wt = it.second;
+
+            if (!visited[v] && wt < key[v]) {
+                key[v] = wt;
+                parent[v] = u;
+            }
+        }
+    }
+
+    int totalCost = 0;
+    cout << "\n--- Simple Prim's (Without Priority Queue) ---\n";
+    cout << "Edges in MST:\n";
+    for (int i = 1; i < V; i++) {
+        cout << parent[i] << " - " << i
+             << " (weight = " << key[i] << ")\n";
+        totalCost += key[i];
+    }
+    cout << "Total cost = " << totalCost << endl;
+}
+
+int main() {
+    cout << "Enter number of vertices and edges:\n";
+    int V, E;
+    cin >> V >> E;
+
+    vector<vector<pair<int,int>>> adj(V);
+    cout << "Enter edges (u v weight):\n";
+    for (int i = 0; i < E; i++) {
+        int u, v, wt;
+        cin >> u >> v >> wt;
+        adj[u].push_back({v, wt});
+        adj[v].push_back({u, wt});
+    }
+
+    primSimple(V, adj);
+
+    return 0;
+}
