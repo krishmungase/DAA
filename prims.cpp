@@ -1,6 +1,9 @@
-#include <bits/stdc++.h>
-using namespace std;
+// ## Prim's Algorithm Implementation (With Time Measurement)
 
+#include <bits/stdc++.h>
+#include <chrono>
+using namespace std;
+using namespace std::chrono;
 
 void primSimple(int V, vector<vector<pair<int,int>>> &adj) {
     vector<int> key(V, INT_MAX);
@@ -58,7 +61,14 @@ int main() {
         adj[v].push_back({u, wt});
     }
 
+    auto start = high_resolution_clock::now();
     primSimple(V, adj);
+
+    auto end = high_resolution_clock::now();
+    auto timeTaken = duration_cast<nanoseconds>(end - start);
+
+    cout << "\nTime Taken by Simple Prim's Algorithm = "
+         << timeTaken.count() << " nanoseconds\n";
 
     return 0;
 }
