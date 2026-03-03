@@ -26,9 +26,11 @@ int findMinimumCoins(vector<int>& coins, int index, int amount, vector<vector<in
     return dp[index][amount];
 }
 
-int coinChange(vector<int>& coins, int amount, vector<vector<int>>& dp)
+int coinChange(vector<int>& coins, int amount)
 {
     int n = coins.size();
+
+    vector<vector<int>> dp(n, vector<int>(amount + 1, -1));
 
     int result = findMinimumCoins(coins, n - 1, amount, dp);
 
@@ -54,39 +56,12 @@ int main()
     cout << "Enter target amount: ";
     cin >> amount;
 
-    vector<vector<int>> dp(n, vector<int>(amount + 1, -1));
-
-    int minimumCoins = coinChange(coins, amount, dp);
+    int minimumCoins = coinChange(coins, amount);
 
     if (minimumCoins == -1)
-        cout << "\nAmount cannot be formed using given coins\n";
+        cout << "Amount cannot be formed using given coins" << endl;
     else
-        cout << "\nMinimum coins required = " << minimumCoins << endl;
-
-    for (int i = 0; i < n; i++)
-        dp[i][0] = 0;
-
-    cout << "\nDP Table (rows = coin index, cols = amount)\n\n";
-
-    cout << setw(5) << " ";
-    for (int j = 0; j <= amount; j++)
-        cout << setw(5) << j;
-
-    cout << "\n------------------------------------------------------------\n";
-
-    for (int i = 0; i < n; i++) {
-        cout << setw(3) << i << " |";
-        for (int j = 0; j <= amount; j++) {
-
-            if (dp[i][j] == -1)
-                cout << setw(5) << ".";
-            else if (dp[i][j] >= 1e9)
-                cout << setw(5) << "INF";
-            else
-                cout << setw(5) << dp[i][j];
-        }
-        cout << endl;
-    }
+        cout << "Minimum coins required = " << minimumCoins << endl;
 
     return 0;
 }
