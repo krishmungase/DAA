@@ -1,115 +1,94 @@
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;
 
-const int INF = INT_MAX;
+int N;
+int cost[10][10];
+bool visited[10];
+int minCost = 100000;
 
-struct Node {
-    vector<vector<int>> mat;
-    int cost, vertex, level;
-    vector<int> path;
-    bool operator>(const Node& o) const { return cost > o.cost; }
-};
+int bestPath[20], currPath[20];
 
-int reduce(vector<vector<int>>& mat, int n) {
-    int cost = 0;
-    for (int i = 0; i < n; i++) {
-        int mn = INF;
-        for (int j = 0; j < n; j++) if (mat[i][j] != INF) mn = min(mn, mat[i][j]);
-        if (mn != INF && mn > 0) {
-            cost += mn;
-            for (int j = 0; j < n; j++) if (mat[i][j] != INF) mat[i][j] -= mn;
+
+void tsp(int currCity, int count, int currCost) {
+
+    if (count == N && cost[currCity][0]) {
+        int total = currCost + cost[currCity][0];
+
+        if (total < minCost) {
+            minCost = total;
+
+            for (int i = 0; i < N; i++)
+                bestPath[i] = currPath[i];
+
+            bestPath[N] = 0;
         }
+        return;
     }
-    for (int j = 0; j < n; j++) {
-        int mn = INF;
-        for (int i = 0; i < n; i++) if (mat[i][j] != INF) mn = min(mn, mat[i][j]);
-        if (mn != INF && mn > 0) {
-            cost += mn;
-            for (int i = 0; i < n; i++) if (mat[i][j] != INF) mat[i][j] -= mn;
-        }
-    }
-    return cost;
-}
 
-pair<int, vector<int>> solveTSP(vector<vector<int>> input, int n) {
-    Node root;
-    root.mat = input;
-    root.level = 0;
-    root.vertex = 0;
-    root.path = {0};
-    root.cost = reduce(root.mat, n);
+    for (int i = 0; i < N; i++) {
+        if (!visited[i] && cost[currCity][i]) {
 
-    priority_queue<Node, vector<Node>, greater<Node>> pq;
-    pq.push(root);
+            int temp = currCost + cost[currCity][i];
 
-    int best = INF;
-    vector<int> finalPath;
+            if (temp < minCost) {
 
-    while (!pq.empty()) {
-        Node curr = pq.top(); pq.pop();
-        if (curr.cost >= best) continue;
+                visited[i] = true;
+                currPath[count] = i;
 
-        int i = curr.vertex;
+                tsp(i, count + 1, temp);
 
-        if (curr.level == n - 1) {
-            if (curr.mat[i][0] != INF) {
-                int total = curr.cost + curr.mat[i][0];
-                if (total < best) {
-                    best = total;
-                    finalPath = curr.path;
-                    finalPath.push_back(0);
-                }
+                visited[i] = false;
+               
             }
-            continue;
-        }
-
-        for (int j = 0; j < n; j++) {
-            if (curr.mat[i][j] == INF) continue;
-            bool seen = false;
-            for (int c : curr.path) if (c == j) { seen = true; break; }
-            if (seen) continue;
-
-            Node child;
-            child.mat = curr.mat;
-            child.level = curr.level + 1;
-            child.vertex = j;
-            child.path = curr.path;
-            child.path.push_back(j);
-
-            for (int k = 0; k < n; k++) child.mat[i][k] = INF;
-            for (int k = 0; k < n; k++) child.mat[k][j] = INF;
-            if (child.level < n - 1) child.mat[j][0] = INF;
-
-            child.cost = curr.cost + curr.mat[i][j] + reduce(child.mat, n);
-            if (child.cost < best) pq.push(child);
         }
     }
-
-    return {best, finalPath};
 }
 
 int main() {
-    int n;
+
     cout << "Enter number of cities: ";
-    cin >> n;
+    cin >> N;
 
-    cout << "Enter cost matrix (" << n << "x" << n << "), enter -1 for no edge:\n";
-    vector<vector<int>> mat(n, vector<int>(n));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++) {
-            cin >> mat[i][j];
-            if (mat[i][j] == -1 || i == j) mat[i][j] = INF;
-        }
+    cout << "Enter cost matrix:\n";
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++)
+            cin >> cost[i][j];
 
-    auto [cost, path] = solveTSP(mat, n);
+    for (int i = 0; i < N; i++)
+        visited[i] = false;
 
-    cout << "\nMinimum Cost: " << cost << "\n";
-    cout << "Path: ";
-    for (int k = 0; k < (int)path.size(); k++) {
-        cout << path[k];
-        if (k + 1 < (int)path.size()) cout << " -> ";
+    visited[0] = true;
+    currPath[0] = 0;
+
+    tsp(0, 1, 0);
+
+    cout << "\nOptimal Path: ";
+    for (int i = 0; i <= N; i++)
+        cout << bestPath[i] << " ";
+
+    cout << "\n\nCost Calculation:\n";
+
+    int total = 0;
+
+    for (int i = 0; i < N; i++) {
+        int from = bestPath[i];
+        int to = bestPath[i + 1];
+
+        cout << "Cost(" << from << " -> " << to << ") = "
+             << cost[from][to] << endl;
+
+        total += cost[from][to];
     }
-    cout << "\n";
+
+    // Summation format
+    cout << "\nTotal Cost = ";
+
+    for (int i = 0; i < N; i++) {
+        cout << cost[bestPath[i]][bestPath[i + 1]];
+        if (i < N - 1) cout << " + ";
+    }
+
+    cout << " = " << total << endl;
 
     return 0;
 }
